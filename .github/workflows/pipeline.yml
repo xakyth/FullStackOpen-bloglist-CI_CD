@@ -3,7 +3,7 @@ name: Deployment pipeline
 on:
   push:
     branches:
-      - main
+      - messing_with_workflow
 
 jobs:
   deployment_pipeline:
