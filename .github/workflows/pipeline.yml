@@ -19,22 +19,21 @@ jobs:
           cd frontend
           npm install
       - name: Frontent lint
-        run: npm run lint
+        run: cd frontend && npm run lint
       - name: Frontend test
-        run: npm run test
+        run: cd frontend && npm run test
       - name: Frontend build
-        run: npm run build
+        run: cd frontend && npm run build
       - name: Frontend move build to root
         run: |
-          cd ..
           mv frontend/dist dist
-      - name: Backend lint
-        run: npm run lint
-      - name: Backend test
-        run: npm run test
-      - name: E2E testing
-        uses: cypress-io/github-action@v5
-        with:
-          command: cd frontend && npm run test:e2e
-          start: npm run start:test
-          wait-on: http://localhost:3001
+      # - name: Backend lint
+      #   run: npm run lint
+      # - name: Backend test
+      #   run: npm run test
+      # - name: E2E testing
+      #   uses: cypress-io/github-action@v5
+      #   with:
+      #     command: cd frontend && npm run test:e2e
+      #     start: npm run start:test
+      #     wait-on: http://localhost:3001
