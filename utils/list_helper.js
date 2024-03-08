@@ -1,12 +1,15 @@
 const _ = require('lodash');
 
-const dummy = (blogs) => 1;
+const dummy = () => 1;
 
 const totalLikes = (blogs) => blogs.reduce((acc, cur) => acc + cur.likes, 0);
 
 const favoriteBlog = (blogs) => {
   if (blogs.length === 0) return undefined;
-  return blogs.reduce((maxLikes, cur) => (cur.likes > maxLikes.likes ? cur : maxLikes), blogs[0]);
+  return blogs.reduce(
+    (maxLikes, cur) => (cur.likes > maxLikes.likes ? cur : maxLikes),
+    blogs[0],
+  );
 };
 
 const mostBlogs = (blogs) => {
@@ -27,5 +30,9 @@ const mostLikes = (blogs) => {
 };
 
 module.exports = {
-  dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes,
+  dummy,
+  totalLikes,
+  favoriteBlog,
+  mostBlogs,
+  mostLikes,
 };

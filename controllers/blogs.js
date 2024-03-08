@@ -1,5 +1,5 @@
-const middleware = require('../utils/middleware');
 const blogsRouter = require('express').Router();
+const middleware = require('../utils/middleware');
 const Blog = require('../models/blog');
 const User = require('../models/user');
 
@@ -18,7 +18,7 @@ blogsRouter.get('/:id', async (request, response, next) => {
   }
 });
 
-blogsRouter.post('/', middleware.userExtractor, async (request, response, next) => {
+blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   const blog = request.body;
   blog.likes = blog.likes || 0;
   if (!blog.title) {
@@ -28,7 +28,7 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response, next) 
     return response.status(400).json({ message: 'url cannot be empty' });
   }
 
-  const user = request.user;
+  const { user } = request;
   const userObj = await User.findById(user.id);
   if (!userObj) {
     return response.status(404).json({ messge: 'no such user' });
@@ -44,46 +44,50 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response, next) 
   blogObject = await blogObject.save();
   await blogObject.populate('user', ['username', 'name']);
 
-  response.status(201).json(blogObject);
+  return response.status(201).json(blogObject);
 });
 
 blogsRouter.post(
   '/:id/comments',
   middleware.userExtractor,
   async (request, response, next) => {
-    const { id } = request.params
-    const { comment } = request.body
+    const { id } = request.params;
+    const { comment } = request.body;
     try {
-      let blog = await Blog.findById(id)
-      blog.comments = blog.comments.concat(comment)
-      const result = await blog.save()
-      response.status(200).json(result)
+      const blog = await Blog.findById(id);
+      blog.comments = blog.comments.concat(comment);
+      const result = await blog.save();
+      return response.status(200).json(result);
     } catch (exception) {
-      return next(exception)
+      return next(exception);
     }
-  }
-)
+  },
+);
 
-blogsRouter.delete('/:id', middleware.userExtractor, async (request, response, next) => {
-  const { id } = request.params;
-  const user = request.user;
+blogsRouter.delete(
+  '/:id',
+  middleware.userExtractor,
+  async (request, response, next) => {
+    const { id } = request.params;
+    const { user } = request;
 
-  const blog = await Blog.findById(id);
-  if (!blog) {
-    return response.status(204).end();
-  }
-  const userObj = await User.findById(user.id);
-  if (userObj._id.toString() === blog.user.toString()) {
-    try {
-      await blog.deleteOne();
-      response.status(204).end();
-    } catch (error) {
-      return next(error);
+    const blog = await Blog.findById(id);
+    if (!blog) {
+      return response.status(204).end();
     }
-  } else {
-    response.status(403).json({ error: 'no access to delete the blog' });
-  }
-});
+    const userObj = await User.findById(user.id);
+    if (userObj._id.toString() === blog.user.toString()) {
+      try {
+        await blog.deleteOne();
+        response.status(204).end();
+      } catch (error) {
+        return next(error);
+      }
+    } else {
+      response.status(403).json({ error: 'no access to delete the blog' });
+    }
+  },
+);
 
 blogsRouter.put('/:id', async (request, response, next) => {
   const { id } = request.params;
@@ -93,7 +97,7 @@ blogsRouter.put('/:id', async (request, response, next) => {
     url: request.body.url,
     likes: request.body.likes,
     user: request.body.user.id,
-  }
+  };
 
   try {
     await Blog.findByIdAndUpdate(id, blog, { runValidators: true });

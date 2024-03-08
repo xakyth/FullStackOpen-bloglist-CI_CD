@@ -1,5 +1,5 @@
-const app = require('../app');
 const supertest = require('supertest');
+const app = require('../app');
 const User = require('../models/user');
 const helper = require('./test_helper');
 
@@ -38,7 +38,7 @@ describe('initially there are some users in DB', () => {
       const usersAtEnd = await helper.usersInDb();
       expect(usersAtEnd).toHaveLength(usersAtStart.length + 1);
       expect(
-        usersAtEnd.find((user) => user.username === newUser.username)
+        usersAtEnd.find((user) => user.username === newUser.username),
       ).toBeDefined();
     });
     test('cannot create user with username less than 3 characters', async () => {

@@ -118,7 +118,7 @@ describe('initially some blogs saved', () => {
       await api
         .post('/api/blogs')
         .send(newBlog)
-        .expect(401)
+        .expect(401);
     });
   });
   describe('deletion of a blog', () => {
