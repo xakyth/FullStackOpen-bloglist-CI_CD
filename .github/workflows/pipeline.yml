@@ -1,0 +1,40 @@
+name: Deployment pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deployment_pipeline:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: |
+          npm install
+          cd frontend
+          npm install
+      - name: Frontent lint
+        run: npm run lint
+      - name: Frontend test
+        run: npm run test
+      - name: Frontend build
+        run: npm run build
+      - name: Frontend move build to root
+        run: |
+          cd ..
+          mv frontend/dist dist
+      - name: Backend lint
+        run: npm run lint
+      - name: Backend test
+        run: npm run test
+      - name: E2E testing
+        uses: cypress-io/github-action@v5
+        with:
+          command: cd frontend && npm run test:e2e
+          start: npm run start:test
+          wait-on: http://localhost:3001
