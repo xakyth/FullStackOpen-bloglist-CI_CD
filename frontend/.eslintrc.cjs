@@ -17,11 +17,11 @@ module.exports = {
       { allowConstantExport: true },
     ],
     'react/prop-types': false,
-    'indent': ['error', 2],
+    indent: ['error', 2],
     'linebreak-style': ['error', 'unix'],
-    'quotes': ['error', 'single'],
-    'semi': ['error', 'never'],
-    'eqeqeq': 'error',
+    quotes: ['error', 'single'],
+    semi: ['error', 'never'],
+    eqeqeq: 'error',
     'no-trailing-spaces': 'error',
     'object-curly-spacing': ['error', 'always'],
     'arrow-spacing': ['error', { before: true, after: true }],
@@ -29,17 +29,13 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 0,
     'no-unused-vars': 0,
-    'overrides': [
-      {
-        "files": [
-          "**/*.test.js",
-          "**/*.test.jsx"
-        ],
-        "env": {
-          "jest": true
-        }
-      }
-    ]
   },
+  overrides: [
+    {
+      files: ['**/*.test.js', '**/*.test.jsx'],
+      env: {
+        jest: true,
+      },
+    },
+  ],
 };
-
