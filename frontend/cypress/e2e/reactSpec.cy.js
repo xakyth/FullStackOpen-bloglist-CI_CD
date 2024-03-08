@@ -61,7 +61,7 @@ describe('Blog app', function () {
           likes: Math.round(Math.random() * 100),
         })
       })
-      it('user can like a blog', async function () {
+      it('user can like a blog', function () {
         cy.contains('Automatically created blog').find('button').click()
         cy.contains('div.blogFull', 'Automatically created blog')
           .contains('button', 'like')
@@ -69,7 +69,7 @@ describe('Blog app', function () {
           .invoke('text')
           .as('initialLikes')
         let initialLikes
-        await cy.get('@initialLikes').then((text) => {
+        cy.get('@initialLikes').then((text) => {
           initialLikes = text
         })
         cy.contains('div.blogFull', 'Automatically created blog')

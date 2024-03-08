@@ -22,7 +22,7 @@ describe('<Blog />', () => {
     name: 'Roman',
   }
 
-  test("blog's title and author rendered by default, but no URL likes user", () => {
+  test('blog\'s title and author rendered by default, but no URL likes user', () => {
     const { container } = render(
       <Blog
         blog={blog}
