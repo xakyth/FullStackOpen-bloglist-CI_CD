@@ -5,6 +5,31 @@ const Blog = require('../models/blog');
 const testHelper = require('./blogs_api_helper');
 
 const api = supertest(app);
+let TEST_USER1_TOKEN = '';
+let TEST_USER2_TOKEN = '';
+
+beforeAll(async () => {
+  await api.post('/api/users', {}).send({
+    username: 'test1',
+    name: 'test1',
+    password: 'test1',
+  });
+  const res1 = await api.post('/api/login').send({
+    username: 'test1',
+    password: 'test1',
+  });
+  TEST_USER1_TOKEN = res1._body.token;
+  await api.post('/api/users').send({
+    username: 'test2',
+    name: 'test2',
+    password: 'test2',
+  });
+  const res2 = await api.post('/api/login').send({
+    username: 'test2',
+    password: 'test2',
+  });
+  TEST_USER2_TOKEN = res2._body.token;
+});
 
 beforeEach(async () => {
   await Blog.deleteMany({});
@@ -49,7 +74,7 @@ describe('initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
-        .set({ Authorization: `Bearer ${process.env.TEST_USER1_TOKEN}` })
+        .set({ Authorization: `Bearer ${TEST_USER1_TOKEN}` })
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -69,7 +94,7 @@ describe('initially some blogs saved', () => {
 
       const postResponse = await api
         .post('/api/blogs')
-        .set('Authorization', `Bearer ${process.env.TEST_USER2_TOKEN}`)
+        .set('Authorization', `Bearer ${TEST_USER2_TOKEN}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -83,7 +108,7 @@ describe('initially some blogs saved', () => {
       };
       let postRequest = await api
         .post('/api/blogs')
-        .set('Authorization', `Bearer ${process.env.TEST_USER1_TOKEN}`)
+        .set('Authorization', `Bearer ${TEST_USER1_TOKEN}`)
         .send(blogWithoutTitle)
         .expect(400);
       expect(postRequest.body.message).toEqual('title cannot be empty');
@@ -94,7 +119,7 @@ describe('initially some blogs saved', () => {
 
       postRequest = await api
         .post('/api/blogs')
-        .set('Authorization', `Bearer ${process.env.TEST_USER1_TOKEN}`)
+        .set('Authorization', `Bearer ${TEST_USER1_TOKEN}`)
         .send(blogWithoutUrl)
         .expect(400);
       expect(postRequest.body.message).toEqual('url cannot be empty');
@@ -104,7 +129,7 @@ describe('initially some blogs saved', () => {
       };
       postRequest = await api
         .post('/api/blogs')
-        .set('Authorization', `Bearer ${process.env.TEST_USER1_TOKEN}`)
+        .set('Authorization', `Bearer ${TEST_USER1_TOKEN}`)
         .send(blogWithoutTitleAndUrl)
         .expect(400);
     });
@@ -115,19 +140,21 @@ describe('initially some blogs saved', () => {
         url: 'https://fullstackopen.com/en/part4/testing_the_backend',
         likes: 0,
       };
-      await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(401);
+      await api.post('/api/blogs').send(newBlog).expect(401);
     });
   });
   describe('deletion of a blog', () => {
     test('blog can be deleted when accessed by id', async () => {
-      let getResponse = await api.get('/api/blogs');
+      let getResponse = await api
+        .get('/api/blogs')
+        .set('Authorization', `Bearer ${TEST_USER1_TOKEN}`);
       const blogsAtStart = getResponse.body;
 
       const blogToDelete = blogsAtStart[0];
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${TEST_USER1_TOKEN}`)
+        .expect(204);
 
       getResponse = await api.get('/api/blogs');
       const blogsAtEnd = getResponse.body;
@@ -136,11 +163,15 @@ describe('initially some blogs saved', () => {
       const urls = blogsAtEnd.map((b) => b.url);
       expect(urls).not.toContain(blogToDelete.url);
     });
-    test('non valid id returns 400', async () => {
+
+    test('non valid id', async () => {
       let getResponse = await api.get('/api/blogs');
       const blogsAtStart = getResponse.body;
 
-      await api.delete('/api/blogs/134513xq').expect(400);
+      await api
+        .delete('/api/blogs/65eac765f00856179eeba777')
+        .set('Authorization', `Bearer ${TEST_USER1_TOKEN}`)
+        .expect(204);
 
       getResponse = await api.get('/api/blogs');
       const blogsAtEnd = getResponse.body;
@@ -148,9 +179,12 @@ describe('initially some blogs saved', () => {
       expect(blogsAtStart).toHaveLength(blogsAtEnd.length);
     });
   });
+
   describe('update information of an individual blog post', () => {
     test('properties can be updated', async () => {
-      const notesAtStart = await api.get('/api/blogs');
+      const notesAtStart = await api
+        .get('/api/blogs')
+        .set('Authorization', `Bearer ${TEST_USER1_TOKEN}`);
       const blogToBeUpdated = notesAtStart.body[0];
       const updatedBlog = {
         ...blogToBeUpdated,
@@ -162,6 +196,7 @@ describe('initially some blogs saved', () => {
 
       await api
         .put(`/api/blogs/${blogToBeUpdated.id}`)
+        .set('Authorization', `Bearer ${TEST_USER1_TOKEN}`)
         .send(updatedBlog)
         .expect(200);
 

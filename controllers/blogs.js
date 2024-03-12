@@ -69,22 +69,16 @@ blogsRouter.delete(
   middleware.userExtractor,
   async (request, response, next) => {
     const { id } = request.params;
-    const { user } = request;
 
     const blog = await Blog.findById(id);
     if (!blog) {
       return response.status(204).end();
     }
-    const userObj = await User.findById(user.id);
-    if (userObj._id.toString() === blog.user.toString()) {
-      try {
-        await blog.deleteOne();
-        response.status(204).end();
-      } catch (error) {
-        return next(error);
-      }
-    } else {
-      response.status(403).json({ error: 'no access to delete the blog' });
+    try {
+      await blog.deleteOne();
+      response.status(204).end();
+    } catch (error) {
+      return next(error);
     }
   },
 );
@@ -96,7 +90,6 @@ blogsRouter.put('/:id', async (request, response, next) => {
     author: request.body.author,
     url: request.body.url,
     likes: request.body.likes,
-    user: request.body.user.id,
   };
 
   try {

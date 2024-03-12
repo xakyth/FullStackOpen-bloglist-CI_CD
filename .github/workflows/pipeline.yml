@@ -27,13 +27,13 @@ jobs:
       - name: Frontend move build to root
         run: |
           mv frontend/dist dist
-      # - name: Backend lint
-      #   run: npm run lint
-      # - name: Backend test
-      #   run: npm run test
-      # - name: E2E testing
-      #   uses: cypress-io/github-action@v5
-      #   with:
-      #     command: cd frontend && npm run test:e2e
-      #     start: npm run start:test
-      #     wait-on: http://localhost:3001
+      - name: Backend lint
+        run: npm run lint
+      - name: Backend test
+        run: npm run test
+      - name: E2E testing
+        uses: cypress-io/github-action@v5
+        with:
+          command: npm start:test && cd frontend && npm run test:e2e
+          start: npm run start:test
+          wait-on: http://localhost:3001
