@@ -8,6 +8,8 @@ on:
 jobs:
   deployment_pipeline:
     runs-on: ubuntu-20.04
+    environment:
+      name: .env
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
