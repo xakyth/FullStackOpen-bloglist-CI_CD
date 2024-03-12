@@ -35,6 +35,10 @@ jobs:
         run: npm run test
       - name: E2E testing
         uses: cypress-io/github-action@v5
+        env:
+          TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          PORT: 3001
         with:
           command: npm start:test && cd frontend && npm run test:e2e
           start: npm run start:test
