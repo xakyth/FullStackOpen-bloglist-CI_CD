@@ -46,4 +46,4 @@ jobs:
         with:
           start: npm run start:test
           wait-on: http://localhost:3001
-          command: cd frontend && npm run test:e2e
+          command: npm run test:e2e
