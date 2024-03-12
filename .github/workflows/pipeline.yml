@@ -40,6 +40,6 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           PORT: 3001
         with:
-          command: npm start:test && cd frontend && npm run test:e2e
+          command: cd frontend && npm run test:e2e
           start: npm run start:test
           wait-on: http://localhost:3001
