@@ -3,11 +3,13 @@ name: Deployment pipeline
 on:
   push:
     branches:
-      - main
+      - messing_with_workflow
 
 jobs:
   deployment_pipeline:
     runs-on: ubuntu-20.04
+    environment:
+      name: .env
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,22 +21,29 @@ jobs:
           cd frontend
           npm install
       - name: Frontent lint
-        run: npm run lint
+        run: cd frontend && npm run lint
       - name: Frontend test
-        run: npm run test
+        run: cd frontend && npm run test
       - name: Frontend build
-        run: npm run build
+        run: cd frontend && npm run build
       - name: Frontend move build to root
         run: |
-          cd ..
           mv frontend/dist dist
       - name: Backend lint
         run: npm run lint
       - name: Backend test
+        env:
+          TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: npm run test
       - name: E2E testing
         uses: cypress-io/github-action@v5
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          PORT: 3001
         with:
-          command: cd frontend && npm run test:e2e
           start: npm run start:test
           wait-on: http://localhost:3001
+          command: npm run test:e2e

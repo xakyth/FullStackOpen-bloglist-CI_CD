@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const userRouter = require('express').Router();
-const User = require('../models/user');
 const { default: mongoose } = require('mongoose');
+const User = require('../models/user');
 
 userRouter.get('/', async (request, response) => {
   const users = await User.find({}).populate('blogs', ['url', 'title', 'author']);
@@ -9,27 +9,27 @@ userRouter.get('/', async (request, response) => {
 });
 
 userRouter.get('/:id', async (request, response, next) => {
-  const { id } = request.params
+  const { id } = request.params;
   try {
     const user = await User.findById(id).populate('blogs', [
       'url',
       'title',
       'author',
-    ])
-    response.status(200).json(user)
+    ]);
+    response.status(200).json(user);
   } catch (exception) {
-    next()
+    next();
   }
-})
+});
 
 userRouter.post('/', async (request, response, next) => {
   const { username, name, password } = request.body;
   if (password.length < 3) {
-    let validationError = new mongoose.Error.ValidationError(null);
+    const validationError = new mongoose.Error.ValidationError(null);
     validationError.addError('password', new mongoose.Error.ValidatorError({ message: 'should contain at least 3 characters' }));
     return next(validationError);
   }
-  
+
   const passwordHash = await bcrypt.hash(password, 10);
   const userObject = new User({
     username,

@@ -19,9 +19,11 @@ logger.info('connecting to MongoDB');
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('dist'));
 app.use(middleware.requestLogger);
 app.use(middleware.tokenExtractor);
 if (process.env.NODE_ENV === 'test') {
+  // eslint-disable-next-line global-require
   const testingRouter = require('./controllers/testing');
   app.use('/api/testing', testingRouter);
 }

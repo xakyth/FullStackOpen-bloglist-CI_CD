@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const mongoose = require('mongoose');
 
 const blogSchema = new mongoose.Schema({
@@ -10,7 +11,7 @@ const blogSchema = new mongoose.Schema({
     ref: 'User',
   },
   comments: [String],
-})
+});
 
 blogSchema.set('toJSON', {
   transform: (doc, returnedDoc) => {

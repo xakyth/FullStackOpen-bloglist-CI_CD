@@ -7,7 +7,7 @@ describe('Blog app', function () {
       password: 'p4$$w0rD',
     }
     cy.request('POST', 'http://localhost:3001/api/users', user)
-    cy.visit('http://localhost:5173')
+    cy.visit('http://localhost:3001')
   })
   it('Login form is shown', function () {
     cy.contains('log in to application')
@@ -67,21 +67,18 @@ describe('Blog app', function () {
           .contains('button', 'like')
           .parent()
           .invoke('text')
-          .as('initialLikes')
-        let initialLikes
-        cy.get('@initialLikes').then((text) => {
-          initialLikes = text
-        })
-        cy.contains('div.blogFull', 'Automatically created blog')
-          .contains('button', 'like')
-          .click()
-        cy.contains('div.blogFull', 'Automatically created blog')
-          .contains('button', 'like')
-          .parent()
-          .should(
-            'contain',
-            `likes ${parseInt(initialLikes.split(' ')[1], 10) + 1}`
-          )
+          .then((initialLikes) => {
+            cy.contains('div.blogFull', 'Automatically created blog')
+              .contains('button', 'like')
+              .click()
+            cy.contains('div.blogFull', 'Automatically created blog')
+              .contains('button', 'like')
+              .parent()
+              .should(
+                'contain',
+                `likes ${parseInt(initialLikes.split(' ')[1], 10) + 1}`
+              )
+          })
       })
       it('blog creator can delete his blog', function () {
         cy.contains('div.blogShort', 'Automatically created blog')
@@ -129,16 +126,20 @@ describe('Blog app', function () {
         title: 'some title 2',
         author: 'some author 2',
         url: 'url1',
-        likes: '7'
+        likes: '7',
       })
       cy.createBlog({
         title: 'The title with the most likes',
         author: 'Unnamed',
         url: 'url1',
-        likes: 99
+        likes: 99,
       })
-      cy.get('div.blog').eq(0).should('contain', 'The title with the most likes')
-      cy.get('div.blog').eq(1).should('contain', 'The title with the second most likes')
+      cy.get('div.blog')
+        .eq(0)
+        .should('contain', 'The title with the most likes')
+      cy.get('div.blog')
+        .eq(1)
+        .should('contain', 'The title with the second most likes')
       cy.get('div.blog').eq(2).should('contain', 'some title 1')
       cy.get('div.blog').eq(3).should('contain', 'some title 2')
     })
